@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import {
     CssBaseline,
     Box,
@@ -10,7 +11,8 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { AppBar, Drawer } from '../../components/styles';
 import styled from 'styled-components';
 
@@ -46,8 +48,10 @@ import LivingCertificate from './LivingCertificate';
 import BonafideCertificate from './BonafideCertificate';
 
 const AdminDashboard = () => {
+    const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const toggleDrawer = () => { setOpen(!open); };
+    const { currentUser } = useSelector((state) => state.user);
 
     return (
         <Box sx={{ display: 'flex', backgroundColor: '#f9f7f2', minHeight: '100vh' }}>
@@ -61,6 +65,12 @@ const AdminDashboard = () => {
                         sx={{ marginRight: '36px', color: '#1a1a1a', ...(open && { display: 'none' }) }}
                     >
                         <MenuIcon />
+                    </IconButton>
+                    <IconButton
+                        onClick={() => navigate(-1)}
+                        sx={{ mr: 2, color: '#7d6b5d' }}
+                    >
+                        <ArrowBackIcon />
                     </IconButton>
                     <DashboardTitle variant="h6" noWrap>
                         System Administration
@@ -124,7 +134,7 @@ const AdminDashboard = () => {
                         <Route path="/Admin/students/student/attendance/:id" element={<StudentAttendance situation="Student" />} />
                         <Route path="/Admin/students/student/marks/:id" element={<StudentExamMarks situation="Student" />} />
 
-                        {/* --- Fee Routes (disabled) ---*/}
+                        {/* --- Fee Routes --- */}
                         <Route path="/Admin/fees" element={currentUser ? <ShowFees /> : <Navigate to="/Adminlogin" />} />
                         <Route path="/Admin/students/student/fees/:id" element={<FeeLedger />} />
 

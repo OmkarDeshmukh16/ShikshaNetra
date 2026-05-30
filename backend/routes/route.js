@@ -2,7 +2,7 @@ const router = require('express').Router();
 
 // const { adminRegister, adminLogIn, deleteAdmin, getAdminDetail, updateAdmin } = require('../controllers/admin-controller.js');
 
-const { adminRegister, adminLogIn, getAdminDetail, updateAdmin} = require('../controllers/admin-controller.js');
+const { adminRegister, adminLogIn, getAdminDetail, updateAdmin } = require('../controllers/admin-controller.js');
 
 const { sclassCreate, sclassList, deleteSclass, deleteSclasses, getSclassDetail, getSclassStudents } = require('../controllers/class-controller.js');
 const { complainCreate, complainList, deleteComplain } = require('../controllers/complain-controller.js');
@@ -30,7 +30,7 @@ const {
 const { subjectCreate, classSubjects, deleteSubjectsByClass, getSubjectDetail, deleteSubject, freeSubjectList, allSubjects, deleteSubjects } = require('../controllers/subject-controller.js');
 const { teacherRegister, teacherLogIn, getTeachers, getTeacherDetail, deleteTeachers, deleteTeachersByClass, deleteTeacher, updateTeacherSubject, teacherAttendance } = require('../controllers/teacher-controller.js');
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); 
+const upload = multer({ dest: 'uploads/' });
 const { bulkStudentRegistration } = require('../controllers/student_controller.js');
 
 // --- Super Admin & Demo Request Controllers ---
@@ -49,8 +49,9 @@ const {
 } = require('../controllers/superadmin-controller.js');
 const { verifyToken, requireRole } = require('../middleware/auth.js');
 
-// const { createOrder, verifyPayment } = require('../controllers/payment-controller');
-// const { FeeNotice } = require('../controllers/notice-controller.js')
+const { createOrder, verifyPayment } = require('../controllers/payment-controller');
+const { syncSchoolToRazorpay, createFeeOrder } = require('../controllers/fee-controller');
+const { FeeNotice } = require('../controllers/notice-controller.js')
 
 // ============================================================
 // PUBLIC ROUTES (no auth required)
@@ -159,13 +160,17 @@ router.delete("/SubjectsClass/:id", deleteSubjectsByClass)
 router.post('/BulkStudentReg', upload.single('excelFile'), bulkStudentRegistration);
 
 // --- FINANCIAL LEDGER & FEE MANAGEMENT (disabled) ---
-// router.put('/CollectFees/:id', collectFees);
-// router.post('/FeeNotice', FeeNotice);
+router.put('/CollectFees/:id', collectFees);
+router.post('/FeeNotice', FeeNotice);
 
 // --- ONLINE PAYMENT GATEWAY (RAZORPAY) (disabled) ---
-// router.post('/createOrder', createOrder);
-// router.post('/verifyPayment', verifyPayment);
-// router.post('/SetClassFees', setClassFees);
+router.post('/createOrder', createOrder);
+router.post('/verifyPayment', verifyPayment);
+router.post('/SetClassFees', setClassFees);
+
+// --- RAZORPAY ROUTE: LINKED ACCOUNT & FEE SPLITTING ---
+router.post('/SyncSchoolRazorpay/:adminId', syncSchoolToRazorpay);
+router.post('/CreateFeeOrder', createFeeOrder);
 
 // ============================================================
 // SUPER ADMIN ROUTES (JWT protected)

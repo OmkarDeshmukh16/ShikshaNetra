@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import SeeNotice from '../../components/SeeNotice';
 import CountUp from 'react-countup';
 import SubjectIcon from "../../assets/subjects.svg";
+import AssignmentIcon from "../../assets/assignment.svg";
 import { getSubjectList } from '../../redux/sclassRelated/sclassHandle';
 
 const StudentHomePage = () => {
@@ -15,6 +16,7 @@ const StudentHomePage = () => {
 
     const { userDetails, currentUser, loading } = useSelector((state) => state.user);
     const { subjectsList } = useSelector((state) => state.sclass);
+    const student = userDetails || {};
     const [subjectAttendance, setSubjectAttendance] = useState([]);
 
     const classID = currentUser.sclassName._id
@@ -39,7 +41,7 @@ const StudentHomePage = () => {
         { name: 'Absent', value: overallAbsentPercentage }
     ];
 
-    // const fees = student.fees || { totalAmount: 0, paidAmount: 0, balanceAmount: 0 };
+    const fees = student.fees || { totalAmount: 0, paidAmount: 0, balanceAmount: 0 };
 
 
 
@@ -62,7 +64,7 @@ const StudentHomePage = () => {
                     </Classic3DCard>
                 </Grid>
 
-                {/* Metric Card: Assignments
+                {/* Metric Card: Pending Fees */}
                 <Grid item xs={12} md={3}>
                     <Classic3DCard>
                         <IconBox>
@@ -72,7 +74,6 @@ const StudentHomePage = () => {
                         <MetricData start={0} end={fees.balanceAmount} duration={4} />
                     </Classic3DCard>
                 </Grid>
-                */}
 
                 {/* Metric Card: Attendance Chart */}
                 <Grid item xs={12} md={6}>

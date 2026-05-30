@@ -10,27 +10,29 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StudentSideBar from './StudentSideBar';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import StudentHomePage from './StudentHomePage';
 import StudentProfile from './StudentProfile';
 import StudentSubjects from './StudentSubjects';
 import ViewStdAttendance from './ViewStdAttendance';
 import StudentComplain from './StudentComplain';
-// import StudentFees from './StudentFees';
+import StudentFees from './StudentFees';
 import Logout from '../Logout';
 import AccountMenu from '../../components/AccountMenu';
 import { AppBar, Drawer } from '../../components/styles';
 import styled from 'styled-components';
 
 const StudentDashboard = () => {
+    const navigate = useNavigate();
     const [open, setOpen] = useState(true);
     const toggleDrawer = () => { setOpen(!open); };
 
     return (
         <Box sx={{ display: 'flex', backgroundColor: '#f9f7f2', minHeight: '100vh' }}>
             <CssBaseline />
-            
+
             {/* Styled AppBar: Ink-black text on white surface */}
             <StyledAppBar open={open} position='absolute' elevation={0}>
                 <Toolbar sx={{ pr: '24px', borderBottom: '1px solid #e0dcd0' }}>
@@ -40,6 +42,12 @@ const StudentDashboard = () => {
                         sx={{ marginRight: '36px', color: '#1a1a1a', ...(open && { display: 'none' }) }}
                     >
                         <MenuIcon />
+                    </IconButton>
+                    <IconButton
+                        onClick={() => navigate(-1)}
+                        sx={{ mr: 2, color: '#7d6b5d' }}
+                    >
+                        <ArrowBackIcon />
                     </IconButton>
                     <DashboardTitle variant="h6" noWrap>
                         Scholar Portal
@@ -75,7 +83,7 @@ const StudentDashboard = () => {
                         <Route path="/Student/profile" element={<StudentProfile />} />
                         <Route path="/Student/subjects" element={<StudentSubjects />} />
                         <Route path="/Student/attendance" element={<ViewStdAttendance />} />
-                        {/* <Route path="/Student/fees" element={<StudentFees />} /> */}
+                        <Route path="/Student/fees" element={<StudentFees />} />
                         <Route path="/Student/complain" element={<StudentComplain />} />
                         <Route path="/logout" element={<Logout />} />
                     </Routes>

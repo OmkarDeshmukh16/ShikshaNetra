@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Grid, Box, Paper, TextField, CssBaseline,
     IconButton, InputAdornment, CircularProgress
 } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Visibility, VisibilityOff, ArrowBack } from '@mui/icons-material';
 import SecurityIcon from '@mui/icons-material/Security';
 import styled from 'styled-components';
 import { loginSuperAdmin } from '../../redux/userRelated/userHandle';
@@ -85,6 +85,10 @@ const SuperAdminLoginPage = () => {
                 <Grid item xs={12} sm={8} md={5} component={Paper} elevation={0} square
                     sx={{ backgroundColor: '#ffffff', borderLeft: '1px solid #e0dcd0' }}>
                     <Box sx={{ my: 12, mx: 6, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+
+                        <BackLink to="/">
+                            <ArrowBack sx={{ fontSize: 18, mr: 1 }} /> Back to Home
+                        </BackLink>
 
                         <HeaderSection>
                             <ClassicTitle>Super Admin</ClassicTitle>
@@ -261,5 +265,21 @@ const LoginButton = styled.button`
         box-shadow: none;
         cursor: not-allowed;
         transform: none;
+    }
+`;
+
+const BackLink = styled(Link)`
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Georgia', serif;
+    font-size: 0.9rem;
+    color: #7d6b5d;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+    transition: color 0.2s ease;
+    &:hover {
+        color: #1a1a1a;
     }
 `;

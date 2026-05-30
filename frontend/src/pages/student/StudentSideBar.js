@@ -9,7 +9,7 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import AnnouncementOutlinedIcon from '@mui/icons-material/AnnouncementOutlined';
 import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-// import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 const StudentSideBar = () => {
     const location = useLocation();
@@ -53,12 +53,12 @@ const StudentSideBar = () => {
                     <ListItemText primary="Presence Registry" />
                 </ClassicListItem>
 
-                {/* <ClassicListItem component={Link} to="/Student/fees">
+                <ClassicListItem component={Link} to="/Student/fees">
                     <ListItemIcon>
                         <AccountBalanceWalletIcon color={location.pathname === "/Student/fees" ? 'primary' : 'inherit'} />
                     </ListItemIcon>
                     <ListItemText primary="Fee Ledger" />
-                </ClassicListItem> */}
+                </ClassicListItem>
 
                 <ClassicListItem
                     component={Link}

@@ -56,7 +56,8 @@ const adminSchema = new mongoose.Schema({
         accountNumber: { type: String, default: "" },
         ifscCode: { type: String, default: "" },
         bankName: { type: String, default: "" },
-        branchName: { type: String, default: "" }
+        branchName: { type: String, default: "" },
+        razorpayAccountId: { type: String, default: "" }
     },
     createdAt: {
         type: Date,

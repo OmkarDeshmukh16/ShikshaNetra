@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-    Button, Grid, Box, Typography, Paper, Checkbox, 
-    FormControlLabel, TextField, CssBaseline, IconButton, 
-    InputAdornment, CircularProgress, Backdrop 
+import {
+    Button, Grid, Box, Typography, Paper, Checkbox,
+    FormControlLabel, TextField, CssBaseline, IconButton,
+    InputAdornment, CircularProgress, Backdrop
 } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import login from "../assets/login.jpg"; // Keep your asset
+import { Visibility, VisibilityOff, ArrowBack } from '@mui/icons-material';
+import login from "../assets/login.jpg";
 import styled from 'styled-components';
 import { loginUser } from '../redux/userRelated/userHandle';
 import Popup from '../components/Popup';
@@ -93,10 +93,14 @@ const LoginPage = ({ role }) => {
         <ThemeProvider theme={classicTheme}>
             <Grid container component="main" sx={{ height: '100vh', backgroundColor: "#f9f7f2" }}>
                 <CssBaseline />
-                <Grid item xs={12} sm={8} md={5} component={Paper} elevation={0} square 
+                <Grid item xs={12} sm={8} md={5} component={Paper} elevation={0} square
                     sx={{ borderRight: '1px solid #e0dcd0', backgroundColor: '#fff' }}>
                     <Box sx={{ my: 12, mx: 6, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                        
+
+                        <BackLink to="/choose">
+                            <ArrowBack sx={{ fontSize: 18, mr: 1 }} /> Back to Portals
+                        </BackLink>
+
                         <ClassicTitle variant="h3">
                             {role} Portal
                         </ClassicTitle>
@@ -139,7 +143,7 @@ const LoginPage = ({ role }) => {
                                     ),
                                 }}
                             />
-                            
+
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
                                 <FormControlLabel
                                     control={<Checkbox value="remember" sx={{ '&.Mui-checked': { color: '#1a1a1a' } }} />}
@@ -166,7 +170,7 @@ const LoginPage = ({ role }) => {
                         </Box>
                     </Box>
                 </Grid>
-                
+
                 <Grid item xs={false} sm={4} md={7}
                     sx={{
                         backgroundImage: `url(${login})`,
@@ -268,4 +272,20 @@ const ForgotLink = styled.a`
     color: #666;
     text-decoration: none;
     &:hover { text-decoration: underline; }
+`;
+
+const BackLink = styled(Link)`
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Georgia', serif;
+    font-size: 0.9rem;
+    color: #7d6b5d;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+    transition: color 0.2s ease;
+    &:hover {
+        color: #1a1a1a;
+    }
 `;

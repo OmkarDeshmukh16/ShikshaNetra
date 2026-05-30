@@ -14,7 +14,7 @@ import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccount
 import ReportIcon from '@mui/icons-material/Report';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
-// import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 
 const SideBar = () => {
@@ -72,12 +72,12 @@ const SideBar = () => {
                     <ClassicListItemText primary="Bulk Enrollment" />
                 </ClassicNavButton>
 
-                {/* <ClassicNavButton component={Link} to="/Admin/fees">
+                <ClassicNavButton component={Link} to="/Admin/fees">
                     <ClassicListItemIcon>
                         <AccountBalanceWalletIcon color={location.pathname.startsWith("/Admin/fees") ? 'primary' : 'inherit'} />
                     </ClassicListItemIcon>
                     <ClassicListItemText primary="Fee Ledger" />
-                </ClassicNavButton> */}
+                </ClassicNavButton>
 
                 <ClassicNavButton component={Link} to="/Admin/notices" className={isActive("/Admin/notices") ? "active" : ""}>
                     <ClassicListItemIcon>

@@ -10,8 +10,9 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import TeacherSideBar from './TeacherSideBar';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import Logout from '../Logout';
 import AccountMenu from '../../components/AccountMenu';
 import { AppBar, Drawer } from '../../components/styles';
@@ -28,6 +29,7 @@ import TeacherBulkMarks from './TeacherBulkMarks';
 import TeacherBulkAttendance from './TeacherBulkAttendance';
 
 const TeacherDashboard = () => {
+    const navigate = useNavigate();
     const [open, setOpen] = useState(true);
     const toggleDrawer = () => { setOpen(!open); };
 
@@ -44,6 +46,12 @@ const TeacherDashboard = () => {
                         sx={{ marginRight: '36px', color: '#1a1a1a', ...(open && { display: 'none' }) }}
                     >
                         <MenuIcon />
+                    </IconButton>
+                    <IconButton
+                        onClick={() => navigate(-1)}
+                        sx={{ mr: 2, color: '#7d6b5d' }}
+                    >
+                        <ArrowBackIcon />
                     </IconButton>
                     <DashboardTitle variant="h6" noWrap>
                         Faculty Portal

@@ -22,63 +22,69 @@ const StudentFees = () => {
     const fees = student.fees || { totalAmount: 0, paidAmount: 0, balanceAmount: 0 };
 
     const loadRazorpay = async () => {
-    setLoading(true);
+        setLoading(true);
 
-    try {
-        // 1. Create an Order on your Node.js backend
-        // We send the amount the student needs to pay
-        const { data: order } = await axios.post(`${BASEURL}/createOrder`, {
-            amount: student.fees.balanceAmount 
-        });
+        try {
+            // 1. Create a Route-enabled Order with auto-transfer splits
+            const { data } = await axios.post(`${BASEURL}/CreateFeeOrder`, {
+                studentId: student._id,
+                amount: student.fees.balanceAmount
+            });
 
-        // 2. Configure Razorpay Options
-        const options = {
-            key: "rzp_test_S81Dz6qmTQzLmB", // Replace with your actual Test Key ID
-            amount: order.amount,
-            currency: order.currency,
-            name: "Scholar Portal",
-            description: "Institutional Tuition Fee Settlement",
-            order_id: order.id,
-            handler: async (response) => {
-                try {
-                    // 3. Send payment details to backend for signature verification
-                    const verifyData = {
-                        razorpay_order_id: response.razorpay_order_id,
-                        razorpay_payment_id: response.razorpay_payment_id,
-                        razorpay_signature: response.razorpay_signature,
-                        studentID: student._id,
-                        amount: student.fees.balanceAmount
-                    };
+            if (!data.success) {
+                alert(data.message || "Could not create fee order.");
+                return;
+            }
 
-                    const res = await axios.post(`${BASEURL}/verifyPayment`, verifyData);
-                    
-                    if (res.status === 200) {
-                        alert("Transaction Verified. Ledger Updated Successfully.");
-                        window.location.reload(); // Refresh to show 0 balance and new receipt
+            // 2. Configure Razorpay Checkout using the Master SaaS key
+            const options = {
+                key: data.key,  // Master SaaS public key returned by backend
+                amount: data.order.amount,
+                currency: data.order.currency || "INR",
+                name: "Scholar Portal",
+                description: "Academic Fee Settlement",
+                order_id: data.order.id, // Contains embedded split/transfer rules
+                handler: async (response) => {
+                    try {
+                        // 3. Send payment details to backend for signature verification
+                        const verifyData = {
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            studentID: student._id,
+                            amount: student.fees.balanceAmount
+                        };
+
+                        const res = await axios.post(`${BASEURL}/verifyPayment`, verifyData);
+
+                        if (res.status === 200) {
+                            alert("Transaction Verified. Funds routed directly to school. Ledger Updated.");
+                            window.location.reload();
+                        }
+                    } catch (err) {
+                        alert("Payment verification failed. Please contact the Admin.");
                     }
-                } catch (err) {
-                    alert("Payment verification failed. Please contact the Admin.");
-                }
-            },
-            prefill: {
-                name: student.name,
-                email: student.email,
-                contact: student.phone || ""
-            },
-            theme: { color: "#1a1a1a" } // Matches your Classic Dashboard theme
-        };
+                },
+                prefill: {
+                    name: student.name,
+                    email: student.email,
+                    contact: student.phone || ""
+                },
+                theme: { color: "#1a1a1a" }
+            };
 
-        // 3. Open the Razorpay Modal
-        const rzp = new window.Razorpay(options);
-        rzp.open();
+            // 4. Open the Razorpay Modal
+            const rzp = new window.Razorpay(options);
+            rzp.open();
 
-    } catch (error) {
-        console.error("Razorpay Error:", error);
-        alert("Could not connect to the payment gateway.");
-    } finally {
-        setLoading(false);
-    }
-};
+        } catch (error) {
+            console.error("Razorpay Error:", error);
+            const msg = error.response?.data?.message || "Could not connect to the payment gateway.";
+            alert(msg);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <Box sx={{ p: 4, backgroundColor: '#f9f7f2', minHeight: '90vh' }}>

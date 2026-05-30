@@ -4,7 +4,8 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { AppBar, Drawer } from '../../components/styles';
 import styled from 'styled-components';
 
@@ -16,6 +17,7 @@ import SACreateSchool from './SACreateSchool';
 import Logout from '../Logout';
 
 const SuperAdminDashboard = () => {
+    const navigate = useNavigate();
     const [open, setOpen] = useState(true);
     const toggleDrawer = () => setOpen(!open);
 
@@ -31,6 +33,12 @@ const SuperAdminDashboard = () => {
                         sx={{ marginRight: '36px', color: '#1a1a1a', ...(open && { display: 'none' }) }}
                     >
                         <MenuIcon />
+                    </IconButton>
+                    <IconButton
+                        onClick={() => navigate(-1)}
+                        sx={{ mr: 2, color: '#7d6b5d' }}
+                    >
+                        <ArrowBackIcon />
                     </IconButton>
                     <DashboardTitle variant="h6" noWrap>
                         Super Admin — Platform Control

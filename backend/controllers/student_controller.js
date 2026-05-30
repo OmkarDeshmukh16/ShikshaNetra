@@ -449,6 +449,14 @@ const collectFees = async (req, res) => {
     try {
         const { amount, paymentMethod } = req.body;
         const student = await Student.findById(req.params.id);
+
+        if (!student) return res.status(404).json({ message: "Scholar not found" });
+
+        // Ensure fees object is initialized
+        if (!student.fees || student.fees.totalAmount === 0) {
+            return res.status(400).json({ message: "Fees have not been set for this student yet." });
+        }
+
         const installment = Number(amount);
 
         // Safety Check: Don't allow overpayment
@@ -458,10 +466,7 @@ const collectFees = async (req, res) => {
             });
         }
 
-        if (!student) return res.status(404).json({ message: "Scholar not found" });
-
-        const paid = Number(amount);
-        student.fees.paidAmount += paid;
+        student.fees.paidAmount += installment;
         student.fees.balanceAmount = student.fees.totalAmount - student.fees.paidAmount;
         
         // Update Status automatically
@@ -482,7 +487,8 @@ const collectFees = async (req, res) => {
         await student.save();
         res.status(200).json({ message: "Transaction recorded in ledger" });
     } catch (err) {
-        res.status(500).json(err);
+        console.error("CollectFees Error:", err);
+        res.status(500).json({ message: "Fee collection failed", error: err.message });
     }
 };
 

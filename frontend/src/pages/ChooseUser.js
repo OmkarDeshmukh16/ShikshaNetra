@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Grid, Box, Container, CircularProgress, Backdrop } from '@mui/material';
-import { AccountCircle, School, Group } from '@mui/icons-material';
+import { AccountCircle, School, Group, ArrowBack } from '@mui/icons-material';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../redux/userRelated/userHandle';
@@ -64,6 +64,11 @@ const ChooseUser = ({ visitor }) => {
   return (
     <StyledContainer>
       <Container>
+        <Box sx={{ mb: 4, display: 'flex', justifyContent: 'flex-start' }}>
+          <BackLink to="/">
+            <ArrowBack sx={{ fontSize: 18, mr: 1 }} /> Back to Home
+          </BackLink>
+        </Box>
         <HeaderSection>
           <ClassicTitle>Select Identity</ClassicTitle>
           <p>Please choose your portal to continue to the academic system.</p>
@@ -192,4 +197,19 @@ const CardFooter = styled.div`
   font-weight: 700;
   border-top: 1px solid #eee;
   padding-top: 15px;
+`;
+
+const BackLink = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  font-family: 'Georgia', serif;
+  font-size: 0.9rem;
+  color: #7d6b5d;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: color 0.2s ease;
+  &:hover {
+    color: #1a1a1a;
+  }
 `;
