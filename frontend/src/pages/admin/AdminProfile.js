@@ -171,7 +171,9 @@ const AdminProfile = () => {
                                     <Grid item xs={12}>
                                         <ClassicField label="Full Address" name="address" fullWidth multiline rows={2} value={formData.address} onChange={handleChange} />
                                     </Grid>
-                                    <Typography variant="h6" gutterBottom sx={{ mt: 3, fontWeight: 'bold', color: '#2c3e50' }}>
+                                    {/* Bank Account Details & Razorpay Integration - Commented out per request */}
+                                     {/*
+<Typography variant="h6" gutterBottom sx={{ mt: 3, fontWeight: 'bold', color: '#2c3e50' }}>
                                         Bank Account for Fee Settlement
                                     </Typography>
                                     <Grid container spacing={2}>
@@ -251,8 +253,9 @@ const AdminProfile = () => {
                                         </SyncButton>
                                     )}
 
-                                    <Grid item xs={12}>
-                                        <Update3DButton type="submit" fullWidth>Confirm Registry Update</Update3DButton>
+                                    */}
+                                     <Grid item xs={12}>
+                                         <Update3DButton type="submit" fullWidth>Confirm Registry Update</Update3DButton>
                                     </Grid>
                                 </Grid>
                             </form>

@@ -46,6 +46,7 @@ import ShowFees from './studentRelated/ShowFees';
 import FeeLedger from './studentRelated/FeeLedger';
 import LivingCertificate from './LivingCertificate';
 import BonafideCertificate from './BonafideCertificate';
+import SchoolDocuments from './documentRelated/SchoolDocuments';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -103,6 +104,7 @@ const AdminDashboard = () => {
                         <Route path='*' element={<Navigate to="/" />} />
                         <Route path="/Admin/dashboard" element={<AdminHomePage />} />
                         <Route path="/Admin/profile" element={<AdminProfile />} />
+                        <Route path="/Admin/documents" element={<SchoolDocuments />} />
                         <Route path="/Admin/complains" element={<SeeComplains />} />
                         <Route path="/Admin/students/student/lc/:id" element={<LivingCertificate />} />
                         <Route path="/Admin/students/student/bonafide/:id" element={<BonafideCertificate />} />

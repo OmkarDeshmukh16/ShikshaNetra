@@ -52,6 +52,7 @@ const { verifyToken, requireRole } = require('../middleware/auth.js');
 const { createOrder, verifyPayment } = require('../controllers/payment-controller');
 const { syncSchoolToRazorpay, createFeeOrder } = require('../controllers/fee-controller');
 const { FeeNotice } = require('../controllers/notice-controller.js')
+const { documentUpload, documentList, documentDetail, documentDelete } = require('../controllers/document-controller.js');
 
 // ============================================================
 // PUBLIC ROUTES (no auth required)
@@ -171,6 +172,12 @@ router.post('/SetClassFees', setClassFees);
 // --- RAZORPAY ROUTE: LINKED ACCOUNT & FEE SPLITTING ---
 router.post('/SyncSchoolRazorpay/:adminId', syncSchoolToRazorpay);
 router.post('/CreateFeeOrder', createFeeOrder);
+
+// --- SCHOOL DOCUMENT VAULT ---
+router.post('/DocumentUpload', documentUpload);
+router.get('/DocumentList/:id', documentList);
+router.get('/Document/:id', documentDetail);
+router.delete('/Document/:id', documentDelete);
 
 // ============================================================
 // SUPER ADMIN ROUTES (JWT protected)

@@ -114,7 +114,8 @@ const StudentFees = () => {
                 </Grid>
             </Grid>
 
-            {/* Online Payment Action */}
+            {/* Online Payment Action - Commented out per request */}
+            {/*
             {fees.balanceAmount > 0 && (
                 <PaymentActionBox elevation={0}>
                     <Typography variant="body1" sx={{ fontFamily: 'serif', mb: 2 }}>
@@ -125,6 +126,7 @@ const StudentFees = () => {
                     </Primary3DButton>
                 </PaymentActionBox>
             )}
+            */}
 
             <Divider sx={{ my: 4, borderColor: '#1a1a1a' }} />
 

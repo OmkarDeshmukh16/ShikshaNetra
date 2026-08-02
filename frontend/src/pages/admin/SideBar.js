@@ -15,6 +15,7 @@ import ReportIcon from '@mui/icons-material/Report';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import FolderIcon from '@mui/icons-material/Folder';
 
 
 const SideBar = () => {
@@ -91,6 +92,13 @@ const SideBar = () => {
                         <ReportIcon fontSize="small" />
                     </ClassicListItemIcon>
                     <ClassicListItemText primary="Complains" />
+                </ClassicNavButton>
+
+                <ClassicNavButton component={Link} to="/Admin/documents" className={isActive("/Admin/documents") ? "active" : ""}>
+                    <ClassicListItemIcon>
+                        <FolderIcon fontSize="small" />
+                    </ClassicListItemIcon>
+                    <ClassicListItemText primary="Document Vault" />
                 </ClassicNavButton>
             </React.Fragment>
 
