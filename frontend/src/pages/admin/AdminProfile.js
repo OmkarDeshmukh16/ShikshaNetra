@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Person, School, LocationOn, Fingerprint, Collections, CheckCircle, SyncLock } from '@mui/icons-material';
+import { Person, School, LocationOn, Fingerprint, Collections } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUser, getUserDetails } from '../../redux/userRelated/userHandle';
 import { Box, Paper, Typography, Grid, TextField, Avatar, Button, Collapse, CircularProgress } from '@mui/material';
@@ -60,6 +60,7 @@ const AdminProfile = () => {
         branchName: currentUser.bankDetails?.branchName || ""
     });
 
+    // eslint-disable-next-line no-unused-vars
     const handleBankChange = (e) => {
         setBankDetails({ ...bankDetails, [e.target.name]: e.target.value });
     };

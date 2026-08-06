@@ -10,7 +10,6 @@ import { BASEURL } from '../../utils/apiConfig';
 const StudentFees = () => {
     const dispatch = useDispatch();
     const { currentUser, userDetails, loading: reduxLoading } = useSelector((state) => state.user);
-    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         dispatch(getUserDetails(currentUser._id, "Student"));
@@ -21,70 +20,7 @@ const StudentFees = () => {
     const student = userDetails || {};
     const fees = student.fees || { totalAmount: 0, paidAmount: 0, balanceAmount: 0 };
 
-    const loadRazorpay = async () => {
-        setLoading(true);
 
-        try {
-            // 1. Create a Route-enabled Order with auto-transfer splits
-            const { data } = await axios.post(`${BASEURL}/CreateFeeOrder`, {
-                studentId: student._id,
-                amount: student.fees.balanceAmount
-            });
-
-            if (!data.success) {
-                alert(data.message || "Could not create fee order.");
-                return;
-            }
-
-            // 2. Configure Razorpay Checkout using the Master SaaS key
-            const options = {
-                key: data.key,  // Master SaaS public key returned by backend
-                amount: data.order.amount,
-                currency: data.order.currency || "INR",
-                name: "Scholar Portal",
-                description: "Academic Fee Settlement",
-                order_id: data.order.id, // Contains embedded split/transfer rules
-                handler: async (response) => {
-                    try {
-                        // 3. Send payment details to backend for signature verification
-                        const verifyData = {
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature,
-                            studentID: student._id,
-                            amount: student.fees.balanceAmount
-                        };
-
-                        const res = await axios.post(`${BASEURL}/verifyPayment`, verifyData);
-
-                        if (res.status === 200) {
-                            alert("Transaction Verified. Funds routed directly to school. Ledger Updated.");
-                            window.location.reload();
-                        }
-                    } catch (err) {
-                        alert("Payment verification failed. Please contact the Admin.");
-                    }
-                },
-                prefill: {
-                    name: student.name,
-                    email: student.email,
-                    contact: student.phone || ""
-                },
-                theme: { color: "#1a1a1a" }
-            };
-
-            // 4. Open the Razorpay Modal
-            const rzp = new window.Razorpay(options);
-            rzp.open();
-
-        } catch (error) {
-            console.error("Razorpay Error:", error);
-            const msg = error.response?.data?.message || "Could not connect to the payment gateway.";
-            alert(msg);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     return (
         <Box sx={{ p: 4, backgroundColor: '#f9f7f2', minHeight: '90vh' }}>
@@ -151,21 +87,4 @@ const StatCard = styled(Paper)`
 
 const Label = styled.p` font-family: serif; font-size: 0.8rem; text-transform: uppercase; color: #7d6b5d; margin: 0; `;
 const Amount = styled.p` font-family: 'Georgia', serif; font-size: 1.8rem; font-weight: bold; color: ${props => props.color || '#1a1a1a'}; margin: 10px 0 0 0; `;
-
-const PaymentActionBox = styled(Paper)`
-    && {
-        margin-top: 30px;
-        padding: 30px;
-        background-color: #ffffff;
-        border: 1px dashed #1a1a1a;
-        border-radius: 0;
-        text-align: center;
-    }
-`;
-
-const Primary3DButton = styled.button`
-    background-color: #1a1a1a; color: white; padding: 12px 30px; border: none;
-    font-family: 'Georgia', serif; text-transform: uppercase; letter-spacing: 1px;
-    box-shadow: 4px 4px 0px #7d6b5d; cursor: pointer;
-    &:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px #7d6b5d; }
-`;
+

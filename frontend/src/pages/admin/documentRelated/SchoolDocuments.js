@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import {
     Box,
@@ -72,7 +72,7 @@ const SchoolDocuments = () => {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
     // Fetch school documents
-    const fetchDocuments = async () => {
+    const fetchDocuments = useCallback(async () => {
         if (!adminID) return;
         setLoading(true);
         try {
@@ -84,11 +84,11 @@ const SchoolDocuments = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [adminID]);
 
     useEffect(() => {
         fetchDocuments();
-    }, [adminID]);
+    }, [fetchDocuments]);
 
     // File selection & base64 conversion
     const handleFileChange = (e) => {
