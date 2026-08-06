@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Grid, Paper, Typography, CircularProgress, Divider } from '@mui/material';
 import styled from 'styled-components';
 import { getUserDetails } from '../../redux/userRelated/userHandle';
 import StudentTransactionHistory from './StudentTransactionHistory';
-import axios from 'axios';
-import { BASEURL } from '../../utils/apiConfig';
+
 
 const StudentFees = () => {
     const dispatch = useDispatch();
@@ -50,19 +49,7 @@ const StudentFees = () => {
                 </Grid>
             </Grid>
 
-            {/* Online Payment Action - Commented out per request */}
-            {/*
-            {fees.balanceAmount > 0 && (
-                <PaymentActionBox elevation={0}>
-                    <Typography variant="body1" sx={{ fontFamily: 'serif', mb: 2 }}>
-                        You have an outstanding balance. You can settle the full amount or pay an installment below.
-                    </Typography>
-                    <Primary3DButton onClick={loadRazorpay} disabled={loading}>
-                        Authorize Online Payment
-                    </Primary3DButton>
-                </PaymentActionBox>
-            )}
-            */}
+
 
             <Divider sx={{ my: 4, borderColor: '#1a1a1a' }} />
 

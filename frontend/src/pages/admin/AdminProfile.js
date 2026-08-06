@@ -2,19 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Person, School, LocationOn, Fingerprint, Collections } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUser, getUserDetails } from '../../redux/userRelated/userHandle';
-import { Box, Paper, Typography, Grid, TextField, Avatar, Button, Collapse, CircularProgress } from '@mui/material';
+import { Box, Paper, Typography, Grid, TextField, Avatar, Button, Collapse } from '@mui/material';
 import styled from 'styled-components';
-import axios from 'axios';
-import { BASEURL } from '../../utils/apiConfig';
 
 const AdminProfile = () => {
     const dispatch = useDispatch();
     const { currentUser } = useSelector((state) => state.user);
     const [showTab, setShowTab] = useState(false);
-    const [isSyncing, setIsSyncing] = useState(false);
-
-    // Whether this school is already linked to Razorpay Route
-    const isLinkedToRazorpay = !!currentUser.bankDetails?.razorpayAccountId;
 
     // Initializing with existing institutional data 
     const [formData, setFormData] = useState({
@@ -52,47 +46,7 @@ const AdminProfile = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const [bankDetails, setBankDetails] = useState({
-        accountHolderName: currentUser.bankDetails?.accountHolderName || "",
-        accountNumber: currentUser.bankDetails?.accountNumber || "",
-        ifscCode: currentUser.bankDetails?.ifscCode || "",
-        bankName: currentUser.bankDetails?.bankName || "",
-        branchName: currentUser.bankDetails?.branchName || ""
-    });
 
-    // eslint-disable-next-line no-unused-vars
-    const handleBankChange = (e) => {
-        setBankDetails({ ...bankDetails, [e.target.name]: e.target.value });
-    };
-
-    // ── Razorpay Route Onboarding ─────────────────────────────
-    const handleRazorpaySync = async () => {
-        setIsSyncing(true);
-        try {
-            const response = await axios.post(
-                `${BASEURL}/SyncSchoolRazorpay/${currentUser._id}`
-            );
-
-            if (response.data.success) {
-                // Re-fetch the admin profile to update currentUser in Redux
-                // This triggers authSuccess → currentUser.bankDetails.razorpayAccountId is set
-                dispatch(getUserDetails(currentUser._id, "Admin"));
-                // Also trigger authSuccess so currentUser in sidebar/header reflects the change
-                const refreshed = await axios.get(`${BASEURL}/Admin/${currentUser._id}`);
-                if (refreshed.data) {
-                    dispatch({ type: 'user/authSuccess', payload: refreshed.data });
-                }
-                alert("✅ Success! Your school is now authorized to receive direct online fee settlements.");
-            }
-        } catch (err) {
-            alert(
-                err.response?.data?.message ||
-                "Sync failed. Please verify your IFSC code and account details, then try again."
-            );
-        } finally {
-            setIsSyncing(false);
-        }
-    };
 
     const handleLogoChange = (e) => {
         const file = e.target.files[0];
@@ -107,7 +61,7 @@ const AdminProfile = () => {
         event.preventDefault();
         // Remove empty password to avoid overwriting with blank string
         const Fields = formData.password === ""
-            ? { ...formData, bankDetails, password: undefined }
+            ? { ...formData, password: undefined }
             : formData;
 
         dispatch(updateUser(Fields, currentUser._id, "Admin"));
@@ -212,36 +166,3 @@ const SectionTitle = styled.h3` font-family: 'Georgia', serif; margin-bottom: 25
 const ClassicField = styled(TextField)` & .MuiOutlinedInput-root { border-radius: 0; & fieldset { border-color: #e0dcd0; } } `;
 const EditButton = styled(Button)` && { border-radius: 0; background-color: #1a1a1a; color: white; margin-top: 20px; font-family: serif; &:hover { background-color: #333; } } `;
 const Update3DButton = styled(Button)` && { background-color: #1a1a1a; color: white; padding: 12px; border-radius: 0; box-shadow: 4px 4px 0px #7d6b5d; font-family: 'Georgia', serif; &:hover { background-color: #333; transform: translate(-1px, -1px); box-shadow: 6px 6px 0px #7d6b5d; } } `;
-
-/* Razorpay Route onboarding styles */
-const RazorpayStatusBox = styled(Box)`
-    margin-top: 20px;
-    padding: 16px 20px;
-    background-color: #e8f5e9;
-    border-left: 4px solid #2e7d32;
-    border-radius: 0;
-`;
-const SyncButton = styled(Button)`
-    && {
-        margin-top: 20px;
-        background: linear-gradient(135deg, #e65100, #ff8f00);
-        color: white;
-        padding: 14px;
-        border-radius: 0;
-        box-shadow: 4px 4px 0px #bf360c;
-        font-family: 'Georgia', serif;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-size: 0.85rem;
-        &:hover {
-            background: linear-gradient(135deg, #bf360c, #e65100);
-            transform: translate(-1px, -1px);
-            box-shadow: 6px 6px 0px #bf360c;
-        }
-        &:disabled {
-            background: #bdbdbd;
-            box-shadow: none;
-            color: #757575;
-        }
-    }
-`;
