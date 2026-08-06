@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Person, School, LocationOn, Fingerprint, Collections } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateUser, getUserDetails } from '../../redux/userRelated/userHandle';
+import { updateUser } from '../../redux/userRelated/userHandle';
 import { Box, Paper, Typography, Grid, TextField, Avatar, Button, Collapse } from '@mui/material';
 import styled from 'styled-components';
 
