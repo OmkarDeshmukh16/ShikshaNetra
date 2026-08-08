@@ -69,13 +69,11 @@ const ShowStudents = () => {
     const exportToExcel = () => {
         // 1. Prepare data from the currently filtered list
         const reportData = filteredStudents.map((student) => ({
-            "Scholar Name": student.name,
+            "Student Name": student.name,
             "Roll Number": student.rollNum,
-            "Academic Class": student.sclassName?.sclassName || "Unassigned",
+            "Class": student.sclassName?.sclassName || "Unassigned",
             "Email": student.email || "N/A",
             "Gender": student.gender || "N/A",
-            "Mobile": student.phone || "N/A",
-            "Password": "REDACTED",
             "Date of birth": student.dob ? new Date(student.dob).toLocaleDateString() : "N/A",
             "Nationality": student.nationality || "N/A",
             "Mother Tongue": student.motherTongue || "N/A",
@@ -83,8 +81,12 @@ const ShowStudents = () => {
             "Caste": student.caste || "N/A",
             "Sub caste": student.subCaste || "N/A",
             "Birth Place": student.birthPlace || "N/A",
-            "Mob no.": student.phone || "N/A",
-            "Address": student.address || "N/A"
+            "Address": student.address || "N/A",
+            "Date of admission": student.admissionDate ? new Date(student.admissionDate).toLocaleDateString() : "N/A",
+            "Previous School Name": student.previousSchoolName || "N/A",
+            "Previous School Standard": student.previousSchoolStandard || "N/A",
+            "Progress": student.progress || "N/A",
+            "Conduct": student.conduct || "N/A",
         }));
 
         // 2. Create worksheet and workbook
@@ -228,7 +230,7 @@ const ShowStudents = () => {
                             disabled={filteredStudents?.length === 0}
                             style={{ borderStyle: 'dashed' }}
                         >
-                            Download GR file
+                            Download GR File
                         </ClassicSmallButton>
                     </Box>
                     <Box sx={{ textAlign: 'right' }}>
