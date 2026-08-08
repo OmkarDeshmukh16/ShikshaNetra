@@ -59,7 +59,7 @@ const SideBar = () => {
                     <ClassicListItemIcon>
                         <PersonOutlineIcon fontSize="small" />
                     </ClassicListItemIcon>
-                    <ClassicListItemText primary="Students" />
+                    <ClassicListItemText primary="General Register" />
                 </ClassicNavButton>
 
                 <ClassicNavButton

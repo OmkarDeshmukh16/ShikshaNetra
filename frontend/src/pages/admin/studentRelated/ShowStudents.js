@@ -109,7 +109,7 @@ const ShowStudents = () => {
         { id: 'rollNum', label: 'Roll No.', minWidth: 100 },
         { id: 'sclassName', label: 'Designated Class', minWidth: 170 },
     ];
-    
+
     const studentRows = filteredStudents?.map((student) => ({
         name: student.name,
         rollNum: student.rollNum,
@@ -189,7 +189,7 @@ const ShowStudents = () => {
         <RegistryContainer>
             <RegistryHeader>
                 <Box>
-                    <TypographyClassic variant="h4">Student Registry</TypographyClassic>
+                    <TypographyClassic variant="h4">General Registr</TypographyClassic>
                     <TypographySubtitle>A comprehensive index of enrolled scholars and academic standings</TypographySubtitle>
                 </Box>
                 {studentsList && studentsList.length > 0 && (
@@ -210,7 +210,7 @@ const ShowStudents = () => {
                             onChange={(e) => setSelectedClass(e.target.value)}
                             size="small"
                         >
-                            <MenuItem value="all"><em>All Registered Scholars</em></MenuItem>
+                            <MenuItem value="all"><em>All Registered Students</em></MenuItem>
                             {sclassesList?.map((sclass) => (
                                 <MenuItem key={sclass._id} value={sclass._id}>
                                     {sclass.sclassName}
@@ -228,7 +228,7 @@ const ShowStudents = () => {
                             disabled={filteredStudents?.length === 0}
                             style={{ borderStyle: 'dashed' }}
                         >
-                            Download Excel Ledger
+                            Download GR file
                         </ClassicSmallButton>
                     </Box>
                     <Box sx={{ textAlign: 'right' }}>
