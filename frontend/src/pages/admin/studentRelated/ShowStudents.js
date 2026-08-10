@@ -69,6 +69,7 @@ const ShowStudents = () => {
     const exportToExcel = () => {
         // 1. Prepare data from the currently filtered list
         const reportData = filteredStudents.map((student) => ({
+            "GR No.": student.generalRegisterNo || "N/A",
             "Student Name": student.name,
             "Roll Number": student.rollNum,
             "Class": student.sclassName?.sclassName || "Unassigned",

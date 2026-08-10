@@ -535,6 +535,50 @@ const updateBulkMarks = async (req, res) => {
     }
 };
 
+const getNextGRNo = async (req, res) => {
+    try {
+        const schoolId = req.params.id;
+
+        // Find all students for this school, pick the one with the highest numeric GR number
+        const students = await Student.find({ school: schoolId })
+            .select('generalRegisterNo')
+            .lean();
+
+        if (!students || students.length === 0) {
+            // No students yet — let admin enter the first GR number manually
+            return res.status(200).json({ nextGRNo: '' });
+        }
+
+        // Extract numeric values from GR numbers and find the maximum
+        let maxNum = 0;
+        let maxLen = 1; // track the padding length of the highest GR number
+
+        students.forEach(s => {
+            if (s.generalRegisterNo) {
+                const num = parseInt(s.generalRegisterNo, 10);
+                if (!isNaN(num) && num > maxNum) {
+                    maxNum = num;
+                    maxLen = s.generalRegisterNo.length;
+                }
+            }
+        });
+
+        if (maxNum === 0) {
+            // Students exist but none have a valid numeric GR number
+            return res.status(200).json({ nextGRNo: '' });
+        }
+
+        // Increment and pad to the same length (e.g., "001" → "002")
+        const nextNum = maxNum + 1;
+        const nextGRNo = String(nextNum).padStart(maxLen, '0');
+
+        res.status(200).json({ nextGRNo });
+    } catch (err) {
+        console.error("GetNextGRNo Error:", err);
+        res.status(500).json({ message: "Error fetching next GR number", error: err.message });
+    }
+};
+
 module.exports = {
     studentRegister,
     studentLogIn,
@@ -556,5 +600,6 @@ module.exports = {
     getStudentsByClass,
     collectFees,
     setClassFees,
-    updateBulkMarks
+    updateBulkMarks,
+    getNextGRNo
 };

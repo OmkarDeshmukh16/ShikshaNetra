@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../../../redux/userRelated/userHandle';
+import axios from 'axios';
+import { BASEURL } from '../../../utils/apiConfig';
 import { Box, CircularProgress, Stack, TextField, Typography, Paper, Grid, MenuItem, Select, FormControl } from '@mui/material';
 import Popup from '../../../components/Popup';
 import styled from 'styled-components';
@@ -65,6 +67,25 @@ const AddStudent = () => {
             setFormData({ ...formData, [name]: value });
         }
     };
+
+    // Fetch the next GR number on component mount
+    useEffect(() => {
+        const fetchNextGRNo = async () => {
+            try {
+                const schoolId = currentUser?._id;
+                if (!schoolId) return;
+
+                const res = await axios.get(`${BASEURL}/NextGRNo/${schoolId}`);
+                if (res.data.nextGRNo) {
+                    setFormData(prev => ({ ...prev, generalRegisterNo: res.data.nextGRNo }));
+                }
+                // If nextGRNo is empty, it means no students exist yet — admin enters first GR manually
+            } catch (err) {
+                console.error("Could not fetch next GR number:", err);
+            }
+        };
+        fetchNextGRNo();
+    }, [currentUser]);
 
     const convertDateToWords = (dateString) => {
         if (!dateString) return "";
