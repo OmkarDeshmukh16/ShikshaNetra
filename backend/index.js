@@ -48,6 +48,14 @@ mongoose
 
 app.use('/', Routes);
 
+// Global Error Handler for Payload Too Large or Body Parsing Errors
+app.use((err, req, res, next) => {
+    if (err && (err.type === 'entity.too.large' || err.status === 413)) {
+        return res.status(413).json({ message: "Payload size is too large for the hosting server. Please upload a file under 3.5MB." });
+    }
+    next(err);
+});
+
 // Serve React frontend (must be AFTER API routes)
 app.use(express.static(path.join(__dirname, "../frontend/build")));
 app.get("*", (req, res) => {

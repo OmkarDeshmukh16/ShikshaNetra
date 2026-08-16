@@ -90,29 +90,83 @@ const SchoolDocuments = () => {
         fetchDocuments();
     }, [fetchDocuments]);
 
-    // File selection & base64 conversion
+    // Helper to compress image files client-side before base64 encoding
+    const compressImage = (file, callback) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                const maxDim = 1600;
+
+                if (width > maxDim || height > maxDim) {
+                    if (width > height) {
+                        height = Math.round((height * maxDim) / width);
+                        width = maxDim;
+                    } else {
+                        width = Math.round((width * maxDim) / height);
+                        height = maxDim;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Convert to JPEG data URL with 0.75 quality for optimal size (<300KB)
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+                callback(compressedDataUrl);
+            };
+            img.onerror = () => {
+                callback(event.target.result);
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    // File selection & base64 conversion with auto-compression
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
         if (!selectedFile) return;
 
-        // Max 10MB limit check
-        if (selectedFile.size > 10 * 1024 * 1024) {
-            setSnackbar({ open: true, message: "File size exceeds 10MB limit.", severity: 'warning' });
+        const isImage = selectedFile.type.startsWith('image/') || selectedFile.name.match(/\.(jpg|jpeg|png|webp|gif|bmp)$/i);
+
+        // Max 3.5MB limit check for non-images to guarantee compatibility with Vercel/Render hosting limits
+        if (!isImage && selectedFile.size > 3.5 * 1024 * 1024) {
+            setSnackbar({ open: true, message: "File size exceeds 3.5MB cloud host limit. Please compress your document before uploading.", severity: 'warning' });
             return;
         }
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setFormData(prev => ({
-                ...prev,
-                file: selectedFile,
-                fileData: reader.result,
-                fileName: selectedFile.name,
-                fileType: selectedFile.type || "application/octet-stream",
-                fileSize: selectedFile.size
-            }));
-        };
-        reader.readAsDataURL(selectedFile);
+        if (isImage) {
+            compressImage(selectedFile, (compressedBase64) => {
+                const approxSize = Math.round((compressedBase64.length * 3) / 4);
+                setFormData(prev => ({
+                    ...prev,
+                    file: selectedFile,
+                    fileData: compressedBase64,
+                    fileName: selectedFile.name.replace(/\.[^/.]+$/, "") + ".jpg",
+                    fileType: 'image/jpeg',
+                    fileSize: approxSize
+                }));
+            });
+        } else {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData(prev => ({
+                    ...prev,
+                    file: selectedFile,
+                    fileData: reader.result,
+                    fileName: selectedFile.name,
+                    fileType: selectedFile.type || "application/octet-stream",
+                    fileSize: selectedFile.size
+                }));
+            };
+            reader.readAsDataURL(selectedFile);
+        }
     };
 
     // Upload submit handler
@@ -154,7 +208,15 @@ const SchoolDocuments = () => {
             }
         } catch (err) {
             console.error("Upload error:", err);
-            setSnackbar({ open: true, message: err.response?.data?.message || "Document upload failed.", severity: 'error' });
+            let errMsg = "Document upload failed.";
+            if (err.response?.status === 413) {
+                errMsg = "File is too large for the hosting server limits (Max 3.5MB). Please compress the document.";
+            } else if (err.response?.data?.message) {
+                errMsg = err.response.data.message;
+            } else if (err.message) {
+                errMsg = err.message;
+            }
+            setSnackbar({ open: true, message: errMsg, severity: 'error' });
         } finally {
             setUploading(false);
         }

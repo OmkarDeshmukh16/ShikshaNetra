@@ -14,7 +14,16 @@ const bulkStudentRegistration = async (req, res) => {
         if (!sclassName) {
             return res.status(400).json({ message: "Sclass ID is required but was not provided." });
         }
-        const workbook = XLSX.readFile(req.file.path);
+        
+        let workbook;
+        if (req.file.buffer) {
+            workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+        } else if (req.file.path) {
+            workbook = XLSX.readFile(req.file.path);
+        } else {
+            return res.status(400).json({ message: "Could not read uploaded Excel file." });
+        }
+
         const sheetName = workbook.SheetNames[0];
         const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
@@ -62,11 +71,15 @@ const bulkStudentRegistration = async (req, res) => {
         // Execute bulk insert with hashed passwords
         const result = await Student.insertMany(students);
 
-        fs.unlinkSync(req.file.path);
+        if (req.file.path && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
         res.status(200).json({ message: `${result.length} Scholars registered with secure credentials.` });
 
     } catch (error) {
-        if (req.file) fs.unlinkSync(req.file.path);
+        if (req.file && req.file.path && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
         console.error("Bulk Hashing Error:", error);
         res.status(500).json({ message: "Registry encryption failed", error: error.message });
     }

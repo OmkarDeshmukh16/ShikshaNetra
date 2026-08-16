@@ -31,7 +31,7 @@ const {
 const { subjectCreate, classSubjects, deleteSubjectsByClass, getSubjectDetail, deleteSubject, freeSubjectList, allSubjects, deleteSubjects } = require('../controllers/subject-controller.js');
 const { teacherRegister, teacherLogIn, getTeachers, getTeacherDetail, deleteTeachers, deleteTeachersByClass, deleteTeacher, updateTeacherSubject, teacherAttendance } = require('../controllers/teacher-controller.js');
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 const { bulkStudentRegistration } = require('../controllers/student_controller.js');
 
 // --- Super Admin & Demo Request Controllers ---
