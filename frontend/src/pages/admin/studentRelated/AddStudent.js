@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../../../redux/userRelated/userHandle';
+import { underControl } from '../../../redux/userRelated/userSlice';
 import axios from 'axios';
 import { BASEURL } from '../../../utils/apiConfig';
 import { Box, CircularProgress, Stack, TextField, Typography, Paper, Grid, MenuItem, Select, FormControl } from '@mui/material';
@@ -54,6 +55,11 @@ const AddStudent = () => {
         phone: '',
         address: ''
     });
+
+    // Reset status in Redux on component mount
+    useEffect(() => {
+        dispatch(underControl());
+    }, [dispatch]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -122,6 +128,7 @@ const AddStudent = () => {
 
     useEffect(() => {
         if (status === 'added') {
+            dispatch(underControl());
             setLoader(false);
             setMessage("Student successfully enrolled in the registry.");
             setShowPopup(true);
@@ -132,8 +139,12 @@ const AddStudent = () => {
             setLoader(false);
             setMessage(response);
             setShowPopup(true);
+        } else if (status === 'error') {
+            setLoader(false);
+            setMessage("Network Error: Connectivity with the archive failed.");
+            setShowPopup(true);
         }
-    }, [status, navigate, response]);
+    }, [status, navigate, response, dispatch]);
 
     return (
         <Box sx={{ backgroundColor: '#f9f7f2', minHeight: '100vh', py: 5 }}>
