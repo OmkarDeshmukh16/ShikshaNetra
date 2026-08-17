@@ -56,9 +56,13 @@ const DemoRequestPage = () => {
             await axios.post(`${BASEURL}/DemoRequest`, formData);
             setSubmitted(true);
         } catch (error) {
-            setServerError(
-                error.response?.data?.message || 'Something went wrong. Please try again later.'
-            );
+            if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
+                setServerError('Unable to connect to backend server. Please ensure the backend server is running.');
+            } else {
+                setServerError(
+                    error.response?.data?.message || 'Something went wrong. Please try again later.'
+                );
+            }
         } finally {
             setLoading(false);
         }

@@ -470,13 +470,26 @@ const SchoolDocuments = () => {
                             </Grid>
                             <Grid item xs={12}>
                                 <UploadDropZone component="label">
-                                    <UploadFileIcon sx={{ fontSize: 40, color: '#7d6b5d', mb: 1 }} />
-                                    <Typography variant="body2" sx={{ fontFamily: 'Georgia, serif', fontWeight: 'bold' }}>
-                                        {formData.file ? formData.fileName : "Click to select a file from your device"}
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ fontFamily: 'serif', color: '#7d6b5d' }}>
-                                        {formData.file ? `${formatBytes(formData.fileSize)} selected` : "Supports PDF, Word, JPEG, PNG (Max 10MB)"}
-                                    </Typography>
+                                    <UploadFileIcon sx={{ fontSize: 42, color: '#7d6b5d', mb: 1 }} />
+                                    {formData.file ? (
+                                        <Box sx={{ width: '100%', textAlign: 'center', px: 2 }}>
+                                            <Typography variant="body1" sx={{ fontFamily: 'Georgia, serif', fontWeight: 'bold', color: '#1a1a1a', mb: 0.5, wordBreak: 'break-word' }}>
+                                                {formData.fileName}
+                                            </Typography>
+                                            <Typography variant="caption" sx={{ fontFamily: 'serif', color: '#2e7d32', fontWeight: 'bold', display: 'inline-block', background: '#e8f5e9', px: 1.5, py: 0.5, borderRadius: '4px' }}>
+                                                ✓ {formatBytes(formData.fileSize)} selected
+                                            </Typography>
+                                        </Box>
+                                    ) : (
+                                        <Box sx={{ textAlign: 'center' }}>
+                                            <Typography variant="body2" sx={{ fontFamily: 'Georgia, serif', fontWeight: 'bold', color: '#1a1a1a', mb: 0.5 }}>
+                                                Click to select a file from your device
+                                            </Typography>
+                                            <Typography variant="caption" sx={{ fontFamily: 'serif', color: '#7d6b5d' }}>
+                                                Supports PDF, Word, JPEG, PNG (Max 3.5MB)
+                                            </Typography>
+                                        </Box>
+                                    )}
                                     <input type="file" hidden onChange={handleFileChange} />
                                 </UploadDropZone>
                             </Grid>
@@ -535,6 +548,8 @@ const TypographyHeader = styled(Typography)`
         letter-spacing: 2px;
         color: #1a1a1a;
         font-weight: 400;
+        line-height: 1.3;
+        font-size: 1.8rem;
     }
 `;
 
@@ -712,9 +727,15 @@ const ActionButton = styled(Button)`
 `;
 
 const UploadDropZone = styled(Box)`
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
     border: 2px dashed #7d6b5d;
     background-color: #fdfcf8;
-    padding: 30px;
+    padding: 25px 20px;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;

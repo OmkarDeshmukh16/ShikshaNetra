@@ -192,14 +192,12 @@ const ShowStudents = () => {
         <RegistryContainer>
             <RegistryHeader>
                 <Box>
-                    <TypographyClassic variant="h4">General Registr</TypographyClassic>
+                    <TypographyClassic variant="h4">General Register</TypographyClassic>
                     <TypographySubtitle>A comprehensive index of enrolled scholars and academic standings</TypographySubtitle>
                 </Box>
-                {studentsList && studentsList.length > 0 && (
-                    <Classic3DButton onClick={() => navigate("/Admin/addstudents")}>
-                        Enroll Scholar
-                    </Classic3DButton>
-                )}
+                <Classic3DButton onClick={() => navigate("/Admin/addstudents")}>
+                    Enroll Scholar
+                </Classic3DButton>
             </RegistryHeader>
 
             {/* CLASSIC FILTER BAR */}
@@ -207,7 +205,7 @@ const ShowStudents = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <FilterListIcon sx={{ color: '#7d6b5d' }} />
                     <Box>
-                        <LabelText>Filter by Academic Cohort</LabelText>
+                        <LabelText>Filter by Academic Year</LabelText>
                         <ClassicSelect
                             value={selectedClass}
                             onChange={(e) => setSelectedClass(e.target.value)}
@@ -249,9 +247,12 @@ const ShowStudents = () => {
                 <TableWrapper>
                     {response || filteredStudents?.length === 0 ? (
                         <EmptyState>
-                            <Typography variant="h6" sx={{ fontFamily: 'serif' }}>
+                            <Typography variant="h6" sx={{ fontFamily: 'serif', mb: 2 }}>
                                 No scholars found in the selected category.
                             </Typography>
+                            <Classic3DButton onClick={() => navigate("/Admin/addstudents")}>
+                                + Enroll Scholar
+                            </Classic3DButton>
                         </EmptyState>
                     ) : (
                         <TableTemplate buttonHaver={StudentButtonHaver} columns={studentColumns} rows={studentRows} />

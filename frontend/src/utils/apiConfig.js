@@ -1,11 +1,18 @@
 import axios from 'axios';
 
-// Backend serves frontend from the same origin on Render,
-// so API calls should be relative (empty base URL).
-// Only set REACT_APP_BASE_URL if frontend and backend are on different domains.
-const rawURL = process.env.REACT_APP_BASE_URL ?? '';
-// Strip any stray quotes that might get injected from env config
-const BASEURL = rawURL.replace(/['"]+/g, '').trim();
+// Get base URL from environment variable
+let rawURL = process.env.REACT_APP_BASE_URL ?? '';
+rawURL = rawURL.replace(/['"]+/g, '').trim();
+
+// If running on a live hosted domain (not localhost), override localhost URLs with relative path ('')
+// so API requests are routed to the hosted backend server origin seamlessly.
+if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    if (rawURL.includes('localhost') || rawURL.includes('127.0.0.1')) {
+        rawURL = '';
+    }
+}
+
+const BASEURL = rawURL;
 
 const axiosInstance = axios.create({
     baseURL: BASEURL,
