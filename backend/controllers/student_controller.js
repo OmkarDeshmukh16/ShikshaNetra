@@ -534,17 +534,33 @@ const updateBulkMarks = async (req, res) => {
     try {
         const { marksData } = req.body;
 
-        const updatePromises = marksData.map(item => 
-            Student.updateOne(
+        if (!marksData || !Array.isArray(marksData)) {
+            return res.status(400).json({ message: "Invalid marks payload." });
+        }
+
+        const updatePromises = marksData.map(async (item) => {
+            const numericMarks = Number(item.marksObtained);
+
+            // 1. Try to update existing subject entry inside student's examResult array
+            const result = await Student.updateOne(
                 { _id: item.studentID, "examResult.subName": item.subID },
-                { $set: { "examResult.$.marksObtained": item.marksObtained } }
-            )
-        );
+                { $set: { "examResult.$.marksObtained": numericMarks } }
+            );
+
+            // 2. If subject entry doesn't exist in examResult yet (matchedCount === 0), push a new subject mark entry
+            if (result.matchedCount === 0) {
+                await Student.updateOne(
+                    { _id: item.studentID },
+                    { $push: { examResult: { subName: item.subID, marksObtained: numericMarks } } }
+                );
+            }
+        });
 
         await Promise.all(updatePromises);
         res.status(200).json({ message: "Academic records updated successfully." });
     } catch (err) {
-        res.status(500).json(err);
+        console.error("Error updating bulk marks:", err);
+        res.status(500).json({ message: "Failed to update academic records", error: err });
     }
 };
 

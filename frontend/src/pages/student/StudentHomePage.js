@@ -11,8 +11,12 @@ import SubjectIcon from "../../assets/subjects.svg";
 import AssignmentIcon from "../../assets/assignment.svg";
 import { getSubjectList } from '../../redux/sclassRelated/sclassHandle';
 
+import { useNavigate } from 'react-router-dom';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+
 const StudentHomePage = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const { userDetails, currentUser, loading } = useSelector((state) => state.user);
     const { subjectsList } = useSelector((state) => state.sclass);
@@ -43,7 +47,12 @@ const StudentHomePage = () => {
 
     const fees = student.fees || { totalAmount: 0, paidAmount: 0, balanceAmount: 0 };
 
-
+    // Examination Marks calculation
+    const examResults = student.examResult || [];
+    const validMarks = examResults.filter(item => item.subName && typeof item.marksObtained === 'number');
+    const totalObtained = validMarks.reduce((acc, curr) => acc + (curr.marksObtained || 0), 0);
+    const maxTotal = validMarks.length * 100;
+    const overallMarksPercent = maxTotal > 0 ? Math.round((totalObtained / maxTotal) * 100) : 0;
 
     return (
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -53,9 +62,36 @@ const StudentHomePage = () => {
             </WelcomeHeader>
 
             <Grid container spacing={4}>
+                {/* Metric Card: Examination Marks */}
+                <Grid item xs={12} md={3}>
+                    <Classic3DCard onClick={() => navigate('/Student/marks')} style={{ cursor: 'pointer' }}>
+                        <IconBox>
+                            <AssessmentIcon sx={{ fontSize: 48, color: '#1a1a1a' }} />
+                        </IconBox>
+                        <MetricTitle>Exam Performance</MetricTitle>
+                        {validMarks.length > 0 ? (
+                            <Box sx={{ textAlign: 'center' }}>
+                                <MetricData start={0} end={overallMarksPercent} duration={2.5} suffix="%" />
+                                <Typography variant="caption" sx={{ display: 'block', fontFamily: 'serif', color: '#2e7d32', fontStyle: 'italic', mt: 0.5 }}>
+                                    {validMarks.length} Subjects Evaluated • Click to View
+                                </Typography>
+                            </Box>
+                        ) : (
+                            <Box sx={{ textAlign: 'center', mt: 1 }}>
+                                <Typography variant="body2" sx={{ fontFamily: 'Georgia', fontStyle: 'italic', color: '#7d6b5d' }}>
+                                    Pending Grades
+                                </Typography>
+                                <Typography variant="caption" sx={{ display: 'block', fontFamily: 'serif', color: '#1a1a1a', mt: 0.5, textDecoration: 'underline' }}>
+                                    Click to Check Marksheet
+                                </Typography>
+                            </Box>
+                        )}
+                    </Classic3DCard>
+                </Grid>
+
                 {/* Metric Card: Subjects */}
                 <Grid item xs={12} md={3}>
-                    <Classic3DCard>
+                    <Classic3DCard onClick={() => navigate('/Student/subjects')} style={{ cursor: 'pointer' }}>
                         <IconBox>
                             <img src={SubjectIcon} alt="Subjects" style={{ width: '50px' }} />
                         </IconBox>
@@ -66,12 +102,12 @@ const StudentHomePage = () => {
 
                 {/* Metric Card: Pending Fees */}
                 <Grid item xs={12} md={3}>
-                    <Classic3DCard>
+                    <Classic3DCard onClick={() => navigate('/Student/fees')} style={{ cursor: 'pointer' }}>
                         <IconBox>
                             <img src={AssignmentIcon} alt="Assignments" style={{ width: '50px' }} />
                         </IconBox>
                         <MetricTitle>Pending fees</MetricTitle>
-                        <MetricData start={0} end={fees.balanceAmount} duration={4} />
+                        <MetricData start={0} end={fees.balanceAmount} duration={4} prefix="₹" />
                     </Classic3DCard>
                 </Grid>
 

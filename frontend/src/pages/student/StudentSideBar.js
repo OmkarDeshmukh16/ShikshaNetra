@@ -10,6 +10,7 @@ import AnnouncementOutlinedIcon from '@mui/icons-material/AnnouncementOutlined';
 import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 
 const StudentSideBar = () => {
     const location = useLocation();
@@ -29,6 +30,17 @@ const StudentSideBar = () => {
                         <HomeIcon fontSize="small" color="inherit" />
                     </ListItemIcon>
                     <ListItemText primary="Institutional Home" />
+                </ClassicListItem>
+
+                <ClassicListItem
+                    component={Link}
+                    to="/Student/marks"
+                    $active={isActive("/Student/marks")}
+                >
+                    <ListItemIcon>
+                        <AssessmentIcon fontSize="small" color="inherit" />
+                    </ListItemIcon>
+                    <ListItemText primary="Examination Marks" />
                 </ClassicListItem>
 
                 <ClassicListItem

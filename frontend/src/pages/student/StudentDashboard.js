@@ -16,6 +16,7 @@ import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import StudentHomePage from './StudentHomePage';
 import StudentProfile from './StudentProfile';
 import StudentSubjects from './StudentSubjects';
+import StudentMarks from './StudentMarks';
 import ViewStdAttendance from './ViewStdAttendance';
 import StudentComplain from './StudentComplain';
 import StudentFees from './StudentFees';
@@ -82,6 +83,7 @@ const StudentDashboard = () => {
                         <Route path="/Student/dashboard" element={<StudentHomePage />} />
                         <Route path="/Student/profile" element={<StudentProfile />} />
                         <Route path="/Student/subjects" element={<StudentSubjects />} />
+                        <Route path="/Student/marks" element={<StudentMarks />} />
                         <Route path="/Student/attendance" element={<ViewStdAttendance />} />
                         <Route path="/Student/fees" element={<StudentFees />} />
                         <Route path="/Student/complain" element={<StudentComplain />} />
@@ -101,18 +103,23 @@ const StyledAppBar = styled(AppBar)`
     && {
         background-color: #ffffff;
         color: #1a1a1a;
+        box-shadow: none;
+        border-bottom: 1px solid #e0dcd0;
         z-index: 1201;
+    }
+    @media print {
+        display: none !important;
     }
 `;
 
 const DashboardTitle = styled(Typography)`
     && {
         font-family: 'Georgia', serif;
-        letter-spacing: 2px;
         text-transform: uppercase;
-        font-size: 1.1rem;
+        letter-spacing: 2px;
         color: #1a1a1a;
-        font-weight: 400;
+        flex-grow: 1;
+        font-size: 1.1rem;
     }
 `;
 
@@ -122,13 +129,23 @@ const StyledDrawer = styled(Drawer)`
         border-right: 1px solid #e0dcd0 !important;
         box-shadow: none !important;
     }
+    @media print {
+        display: none !important;
+    }
 `;
 
 const MainContent = styled(Box)`
     flex-grow: 1;
     height: 100vh;
     overflow: auto;
-    background-color: #f9f7f2; /* The signature ivory background */
+    background-color: #f9f7f2;
+    @media print {
+        height: auto !important;
+        overflow: visible !important;
+        background-color: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
 `;
 
 const styles = {
