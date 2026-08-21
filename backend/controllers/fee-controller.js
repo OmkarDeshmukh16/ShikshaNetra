@@ -1,6 +1,9 @@
 const Razorpay = require('razorpay');
+const crypto = require('crypto');
 const Admin = require('../models/adminSchema');
 const Student = require('../models/studentSchema');
+const PlatformFeeLedger = require('../models/platformFeeLedgerSchema');
+const { PLATFORM_FEE_PER_STUDENT, PAYMENT_CURRENCY } = require('../constants');
 
 // ─────────────────────────────────────────────────────────────
 // Shared Razorpay SDK instance (Master Account credentials)
@@ -237,4 +240,212 @@ const createFeeOrder = async (req, res) => {
     }
 };
 
-module.exports = { syncSchoolToRazorpay, createFeeOrder };
+// =============================================================
+// C. PLATFORM FEE — One-time ₹99 Activation
+// =============================================================
+/**
+ * POST /api/CreatePlatformFeeOrder
+ * Body: { studentId: String }
+ *
+ * Creates a Razorpay Order for the one-time platform activation fee.
+ * The payment goes to the master Razorpay account (no Route transfer).
+ * Students must pay this before they can use the platform.
+ *
+ * Idempotency: If the student has already paid, returns early.
+ */
+const createPlatformFeeOrder = async (req, res) => {
+    try {
+        const { studentId } = req.body;
+
+        if (!studentId) {
+            return res.status(400).json({
+                success: false,
+                message: 'studentId is required.',
+            });
+        }
+
+        // ── Lookup student ────────────────────────────────────
+        const student = await Student.findById(studentId).populate('school');
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: 'Student not found.',
+            });
+        }
+
+        // ── Idempotency — already paid ────────────────────────
+        if (student.platformFeePaid) {
+            return res.status(200).json({
+                success: true,
+                message: 'Platform fee already paid.',
+                alreadyPaid: true,
+            });
+        }
+
+        // ── Create the order (no transfers — stays in master account) ─
+        const razorpay = getRazorpayInstance();
+        const amountInPaisa = Math.round(PLATFORM_FEE_PER_STUDENT * 100);
+
+        const orderOptions = {
+            amount: amountInPaisa,
+            currency: PAYMENT_CURRENCY,
+            receipt: `platform_fee_${studentId}_${Date.now()}`,
+            notes: {
+                type: 'platform_fee',
+                studentId: studentId,
+                schoolId: student.school?._id?.toString() || '',
+                schoolName: student.school?.schoolName || '',
+            },
+        };
+
+        const order = await razorpay.orders.create(orderOptions);
+
+        // ── Record in ledger (status = created, updated to paid on verification) ─
+        await PlatformFeeLedger.create({
+            student: student._id,
+            school: student.school?._id || student.school,
+            razorpayOrderId: order.id,
+            amount: PLATFORM_FEE_PER_STUDENT,
+            status: 'created',
+        });
+
+        return res.status(200).json({
+            success: true,
+            order,
+            amount: PLATFORM_FEE_PER_STUDENT,
+            key: process.env.RAZORPAY_KEY_ID,
+        });
+    } catch (err) {
+        console.error('[createPlatformFeeOrder] Error:', err);
+
+        const razorpayError = err?.error?.description || err.message;
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to create platform fee order.',
+            error: razorpayError,
+        });
+    }
+};
+
+/**
+ * POST /api/VerifyPlatformFeePayment
+ * Body: { razorpay_order_id, razorpay_payment_id, razorpay_signature, studentId }
+ *
+ * Verifies the Razorpay payment signature for the platform fee,
+ * marks the student as platformFeePaid = true, and updates the
+ * PlatformFeeLedger record.
+ */
+const verifyPlatformFeePayment = async (req, res) => {
+    try {
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, studentId } = req.body;
+
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !studentId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing required fields: razorpay_order_id, razorpay_payment_id, razorpay_signature, studentId.',
+            });
+        }
+
+        // ── Verify Razorpay signature ─────────────────────────
+        const sign = razorpay_order_id + '|' + razorpay_payment_id;
+        const expectedSign = crypto
+            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+            .update(sign.toString())
+            .digest('hex');
+
+        if (razorpay_signature !== expectedSign) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid payment signature.',
+            });
+        }
+
+        // ── Update student record ─────────────────────────────
+        const student = await Student.findById(studentId);
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: 'Student not found.',
+            });
+        }
+
+        // Idempotency — already paid
+        if (student.platformFeePaid) {
+            return res.status(200).json({
+                success: true,
+                message: 'Platform fee already recorded.',
+                alreadyPaid: true,
+            });
+        }
+
+        student.platformFeePaid = true;
+        await student.save();
+
+        // ── Update ledger ─────────────────────────────────────
+        await PlatformFeeLedger.findOneAndUpdate(
+            { razorpayOrderId: razorpay_order_id },
+            {
+                razorpayPaymentId: razorpay_payment_id,
+                status: 'paid',
+                paidAt: new Date(),
+            }
+        );
+
+        console.log(`✅ Platform fee paid: Student ${studentId} — ₹${PLATFORM_FEE_PER_STUDENT}`);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Platform fee verified and student activated.',
+        });
+    } catch (err) {
+        console.error('[verifyPlatformFeePayment] Error:', err);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to verify platform fee payment.',
+            error: err.message,
+        });
+    }
+};
+
+/**
+ * GET /api/PlatformFeeStatus/:studentId
+ *
+ * Returns whether the student has paid the platform fee
+ * and the fee amount (so the frontend can show the payment gate).
+ */
+const getPlatformFeeStatus = async (req, res) => {
+    try {
+        const { studentId } = req.params;
+
+        const student = await Student.findById(studentId, 'platformFeePaid name');
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: 'Student not found.',
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            platformFeePaid: student.platformFeePaid,
+            feeAmount: PLATFORM_FEE_PER_STUDENT,
+            currency: PAYMENT_CURRENCY,
+        });
+    } catch (err) {
+        console.error('[getPlatformFeeStatus] Error:', err);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to fetch platform fee status.',
+            error: err.message,
+        });
+    }
+};
+
+module.exports = {
+    syncSchoolToRazorpay,
+    createFeeOrder,
+    createPlatformFeeOrder,
+    verifyPlatformFeePayment,
+    getPlatformFeeStatus,
+};

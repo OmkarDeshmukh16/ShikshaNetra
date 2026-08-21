@@ -51,7 +51,14 @@ const {
 const { verifyToken, requireRole } = require('../middleware/auth.js');
 
 const { createOrder, verifyPayment } = require('../controllers/payment-controller');
-const { syncSchoolToRazorpay, createFeeOrder } = require('../controllers/fee-controller');
+const { syncSchoolToRazorpay, createFeeOrder, createPlatformFeeOrder, verifyPlatformFeePayment, getPlatformFeeStatus } = require('../controllers/fee-controller');
+const {
+    createSubscriptionPlan,
+    createSchoolSubscription,
+    cancelSchoolSubscription,
+    getSubscriptionStatus,
+    subscriptionWebhook,
+} = require('../controllers/subscription-controller');
 const { FeeNotice } = require('../controllers/notice-controller.js')
 const { documentUpload, documentList, documentDetail, documentDelete } = require('../controllers/document-controller.js');
 
@@ -62,8 +69,9 @@ const { documentUpload, documentList, documentDetail, documentDelete } = require
 // Demo Request (public — replaces open registration)
 router.post('/DemoRequest', submitDemoRequest);
 
-// Razorpay Webhook (PUBLIC — no auth; security via signature verification)
+// Razorpay Webhooks (PUBLIC — no auth; security via signature verification)
 router.post('/webhook/razorpay', razorpayWebhook);
+router.post('/webhook/subscription', subscriptionWebhook);
 
 // Admin (school admin login only — registration is disabled)
 // router.post('/AdminReg', adminRegister); // DISABLED: Public registration removed
@@ -175,6 +183,11 @@ router.post('/SetClassFees', setClassFees);
 router.post('/SyncSchoolRazorpay/:adminId', syncSchoolToRazorpay);
 router.post('/CreateFeeOrder', createFeeOrder);
 
+// --- PLATFORM ACTIVATION FEE (₹99 one-time per student) ---
+router.post('/CreatePlatformFeeOrder', createPlatformFeeOrder);
+router.post('/VerifyPlatformFeePayment', verifyPlatformFeePayment);
+router.get('/PlatformFeeStatus/:studentId', getPlatformFeeStatus);
+
 // --- SCHOOL DOCUMENT VAULT ---
 router.post('/DocumentUpload', documentUpload);
 router.get('/DocumentList/:id', documentList);
@@ -196,5 +209,13 @@ router.put('/SuperAdmin/School/:id/plan', verifyToken, requireRole('SuperAdmin')
 router.put('/SuperAdmin/School/:id', verifyToken, requireRole('SuperAdmin'), updateSchoolInfo);
 router.get('/SuperAdmin/DemoRequests', verifyToken, requireRole('SuperAdmin'), getDemoRequests);
 router.put('/SuperAdmin/DemoRequest/:id', verifyToken, requireRole('SuperAdmin'), updateDemoRequestStatus);
+
+// Super Admin — Subscription Management
+router.post('/SuperAdmin/CreateSubscriptionPlan', verifyToken, requireRole('SuperAdmin'), createSubscriptionPlan);
+router.post('/SuperAdmin/School/:id/subscription', verifyToken, requireRole('SuperAdmin'), createSchoolSubscription);
+router.post('/SuperAdmin/School/:id/subscription/cancel', verifyToken, requireRole('SuperAdmin'), cancelSchoolSubscription);
+
+// School Admin — View own subscription status
+router.get('/School/SubscriptionStatus/:adminId', verifyToken, requireRole('Admin'), getSubscriptionStatus);
 
 module.exports = router;

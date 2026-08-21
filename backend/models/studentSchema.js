@@ -41,6 +41,10 @@ const studentSchema = new mongoose.Schema({
         type: String,
         default: "Student"
     },
+    platformFeePaid: {
+        type: Boolean,
+        default: false, // Must pay ₹99 on first login to unlock the platform
+    },
     email: {
         type: String,
     },

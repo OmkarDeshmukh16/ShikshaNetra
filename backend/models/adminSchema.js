@@ -59,6 +59,18 @@ const adminSchema = new mongoose.Schema({
         branchName: { type: String, default: "" },
         razorpayAccountId: { type: String, default: "" }
     },
+    subscription: {
+        razorpaySubscriptionId: { type: String, default: '' },
+        razorpayPlanId: { type: String, default: '' },
+        status: {
+            type: String,
+            enum: ['none', 'created', 'authenticated', 'active', 'paused', 'halted', 'cancelled', 'completed', 'expired', 'pending'],
+            default: 'none',
+        },
+        currentPeriodStart: { type: Date },
+        currentPeriodEnd: { type: Date },
+        updatedAt: { type: Date },
+    },
     createdAt: {
         type: Date,
         default: Date.now,
